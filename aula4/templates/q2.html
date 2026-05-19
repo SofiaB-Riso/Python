@@ -1,4 +1,9 @@
 {% block content %}
-    <h1>Olá {{name}}</h1>
-    <h2>{{age}} anos</h2>
+<ul>
+    {% for pes in pessoa %}
+        <li>
+        <span>{{pes.nome }}  {{pes.idade}}</span>
+        </li>
+    {% endfor %}
+</ul>
 {% endblock %}
