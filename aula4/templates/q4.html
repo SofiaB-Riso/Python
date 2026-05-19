@@ -1,0 +1,10 @@
+{% block content %}
+    <h1>Alunos</h1>
+    <ul class="data-list">
+        {% for aluno in alunos %}
+            <li>
+                <span><strong>{{ aluno.nome }}</strong></span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
