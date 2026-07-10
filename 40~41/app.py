@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import sqlite3
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -106,6 +106,16 @@ def excluir(id):
 def logout():
     session.clear()
     return redirect(url_for("login"))
+
+@app.route("/tarefas/<status>")
+def tarefas_por_status(status):
+    usuario_id = session["usuario_id"]
+    conn = get_db()
+    tarefas = conn.execute("SELECT * FROM tarefas WHERE usuario_id=? AND status=?", (usuario_id, status)).fetchall()
+    conn.close()
+
+    tarefas_json = [{"id": t["id"], "titulo": t["titulo"], "descricao": t["descricao"], "status": t["status"]} for t in tarefas]
+    return jsonify(tarefas_json)
 
 if __name__ == "__main__":
     app.run(debug=True)
