@@ -3,7 +3,17 @@
 <h3>Minhas Tarefas</h3>
 <p class="fst-italic text-muted">Frase motivacional: "{{ frase }}"</p>
 
-<div class="row">
+<!-- Dropdown de filtro -->
+<div class="mb-3">
+    <select id="filtro" class="form-select w-25">
+        <option value="todas">Todas</option>
+        <option value="Pendente">Pendentes</option>
+        <option value="Em andamento">Em andamento</option>
+        <option value="Concluída">Concluídas</option>
+    </select>
+</div>
+
+<div class="row" id="lista-tarefas">
     {% for tarefa in tarefas %}
     <div class="col-md-4">
         <div class="card mb-3 
@@ -24,5 +34,38 @@
     </div>
     {% endfor %}
 </div>
-{% endblock %}
 
+<script>
+document.getElementById("filtro").addEventListener("change", function() {
+    let status = this.value;
+    let url = status === "todas" ? "/dashboard" : "/tarefas/" + status;
+
+    if (status === "todas") {
+        location.reload();
+    } else {
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            let lista = document.getElementById("lista-tarefas");
+            lista.innerHTML = "";
+            data.forEach(t => {
+                lista.innerHTML += `
+                <div class="col-md-4">
+                    <div class="card mb-3 ${t.status === 'Pendente' ? 'border-warning' : t.status === 'Em andamento' ? 'border-primary' : 'border-success'}">
+                        <div class="card-body">
+                            <h5 class="card-title">${t.titulo}</h5>
+                            <p class="card-text">${t.descricao}</p>
+                            <span class="badge bg-secondary">${t.status}</span>
+                            <div class="mt-2">
+                                <a href="/editar/${t.id}" class="btn btn-sm btn-outline-primary">Editar</a>
+                                <a href="/excluir/${t.id}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+        });
+    }
+});
+</script>
+{% endblock %}
