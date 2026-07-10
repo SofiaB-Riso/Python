@@ -6,13 +6,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "minha_chave_secreta"
 
-# Função auxiliar para conectar ao banco
 def get_db():
     conn = sqlite3.connect("tarefas.db")
     conn.row_factory = sqlite3.Row
     return conn
 
-# Página inicial (login)
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -30,7 +28,6 @@ def login():
             flash("Login inválido!")
     return render_template("login.html")
 
-# Registro de usuário
 @app.route("/registro", methods=["GET", "POST"])
 def registro():
     if request.method == "POST":
@@ -47,7 +44,6 @@ def registro():
         return redirect(url_for("login"))
     return render_template("registro.html")
 
-# Dashboard com tarefas e frase motivacional
 @app.route("/dashboard")
 def dashboard():
     if "usuario_id" not in session:
@@ -58,12 +54,10 @@ def dashboard():
     tarefas = conn.execute("SELECT * FROM tarefas WHERE usuario_id = ?", (usuario_id,)).fetchall()
     conn.close()
 
-    # API externa para frase motivacional
     frase = requests.get("https://api.adviceslip.com/advice").json()["slip"]["advice"]
 
     return render_template("dashboard.html", tarefas=tarefas, frase=frase)
 
-# Criar nova tarefa
 @app.route("/nova_tarefa", methods=["GET", "POST"])
 def nova_tarefa():
     if request.method == "POST":
@@ -81,7 +75,6 @@ def nova_tarefa():
         return redirect(url_for("dashboard"))
     return render_template("nova_tarefa.html")
 
-# Editar tarefa
 @app.route("/editar/<int:id>", methods=["GET", "POST"])
 def editar(id):
     conn = get_db()
@@ -101,7 +94,6 @@ def editar(id):
     conn.close()
     return render_template("editar_tarefa.html", tarefa=tarefa)
 
-# Excluir tarefa
 @app.route("/excluir/<int:id>")
 def excluir(id):
     conn = get_db()
@@ -110,7 +102,6 @@ def excluir(id):
     conn.close()
     return redirect(url_for("dashboard"))
 
-# Logout
 @app.route("/logout")
 def logout():
     session.clear()
