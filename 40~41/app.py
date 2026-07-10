@@ -113,10 +113,24 @@ def tarefas_por_status(status):
     conn = get_db()
     tarefas = conn.execute("SELECT * FROM tarefas WHERE usuario_id=? AND status=?", (usuario_id, status)).fetchall()
     conn.close()
-
     tarefas_json = [{"id": t["id"], "titulo": t["titulo"], "descricao": t["descricao"], "status": t["status"]} for t in tarefas]
     return jsonify(tarefas_json)
 
+@app.route("/dados_tarefas")
+def dados_tarefas():
+    usuario_id = session["usuario_id"]
+    conn = get_db()
+    pendentes = conn.execute("SELECT COUNT(*) FROM tarefas WHERE usuario_id=? AND status='Pendente'", (usuario_id,)).fetchone()[0]
+    andamento = conn.execute("SELECT COUNT(*) FROM tarefas WHERE usuario_id=? AND status='Em andamento'", (usuario_id,)).fetchone()[0]
+    concluidas = conn.execute("SELECT COUNT(*) FROM tarefas WHERE usuario_id=? AND status='Concluída'", (usuario_id,)).fetchone()[0]
+    conn.close()
+    return jsonify({"pendentes": pendentes, "andamento": andamento, "concluidas": concluidas})
+
+@app.route("/dashboard_progresso")
+def dashboard_progresso():
+    if "usuario_id" not in session:
+        return redirect(url_for("login"))
+    return render_template("dashboard_progresso.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
-
