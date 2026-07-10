@@ -1,1 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Minhas Tarefas</h3>
+<p class="fst-italic text-muted">Frase motivacional: "{{ frase }}"</p>
+
+<div class="row">
+    {% for tarefa in tarefas %}
+    <div class="col-md-4">
+        <div class="card mb-3 
+            {% if tarefa['status'] == 'Pendente' %} border-warning 
+            {% elif tarefa['status'] == 'Em andamento' %} border-primary 
+            {% elif tarefa['status'] == 'Concluída' %} border-success 
+            {% endif %}">
+            <div class="card-body">
+                <h5 class="card-title">{{ tarefa['titulo'] }}</h5>
+                <p class="card-text">{{ tarefa['descricao'] }}</p>
+                <span class="badge bg-secondary">{{ tarefa['status'] }}</span>
+                <div class="mt-2">
+                    <a href="{{ url_for('editar', id=tarefa['id']) }}" class="btn btn-sm btn-outline-primary">Editar</a>
+                    <a href="{{ url_for('excluir', id=tarefa['id']) }}" class="btn btn-sm btn-outline-danger">Excluir</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
 
